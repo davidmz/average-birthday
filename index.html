@@ -347,7 +347,7 @@
         <div class="result" aria-live="polite">
           <div class="result-label">Результат</div>
           <div class="result-date" id="resultDate">Введите даты</div>
-          <div class="result-note" id="resultNote">Для расчета нужна хотя бы одна корректная дата рождения.</div>
+          <div class="result-note" id="resultNote">Для расчета нужны хотя бы две корректные даты рождения.</div>
         </div>
       </div>
 
@@ -556,7 +556,7 @@
 
       if (entries.length === 0) {
         resultDate.textContent = "Введите даты";
-        resultNote.textContent = "Для расчета нужна хотя бы одна корректная дата рождения.";
+        resultNote.textContent = "Для расчета нужны хотя бы две корректные даты рождения.";
         return;
       }
 
@@ -567,6 +567,12 @@
         y += Math.sin(entry.angle);
         renderPoint(entry);
       });
+
+      if (entries.length < 2) {
+        resultDate.textContent = "Нужна еще одна дата";
+        resultNote.textContent = "Средний день рождения считается минимум по двум датам.";
+        return;
+      }
 
       const vectorLength = Math.hypot(x, y) / entries.length;
       if (vectorLength < 0.000001) {
