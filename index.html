@@ -269,6 +269,19 @@
       min-width: 0;
     }
 
+    .source-link {
+      justify-self: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .source-link a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.18em;
+    }
+
     .swatch {
       width: 11px;
       height: 11px;
@@ -360,6 +373,9 @@
           <span><i class="swatch"></i>День рождения</span>
           <span><i class="swatch average"></i>Средняя дата</span>
         </div>
+        <footer class="source-link">
+          <a href="https://github.com/davidmz/average-birthday" rel="noopener">Исходный код на GitHub</a>
+        </footer>
       </div>
     </section>
   </main>
