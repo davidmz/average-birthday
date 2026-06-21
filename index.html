@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Средний день рождения</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ed;
+      --text: #202326;
+      --muted: #697178;
+      --line: #d8d2c5;
+      --panel: #fffdf8;
+      --accent: #0f766e;
+      --accent-2: #d1495b;
+      --accent-3: #f3a712;
+      --shadow: 0 18px 50px rgba(37, 31, 20, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.10), transparent 34%),
+        linear-gradient(315deg, rgba(209, 73, 91, 0.10), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(310px, 430px) minmax(0, 1fr);
+      min-height: calc(100vh - 64px);
+      overflow: hidden;
+      background: rgba(255, 253, 248, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls,
+    .view {
+      padding: 28px;
+    }
+
+    .controls {
+      border-right: 1px solid var(--line);
+      background: rgba(255, 253, 248, 0.78);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 0 0 26px;
+      max-width: 38rem;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .people {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .person {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 150px 38px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      padding: 9px 10px;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: #a9a194;
+      background: #fbf8f1;
+    }
+
+    .remove {
+      align-self: end;
+      width: 38px;
+      padding: 0;
+      color: var(--accent-2);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .add {
+      width: 100%;
+      background: var(--text);
+      border-color: var(--text);
+      color: #ffffff;
+    }
+
+    .add:hover {
+      background: #34383c;
+      border-color: #34383c;
+    }
+
+    .result {
+      display: grid;
+      gap: 8px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .result-date {
+      min-height: 44px;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800;
+      line-height: 1.08;
+    }
+
+    .result-note {
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .view {
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: min(100%, 680px);
+      margin: 0 auto;
+      aspect-ratio: 1;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .ring {
+      fill: #fffaf0;
+      stroke: var(--line);
+      stroke-width: 2;
+    }
+
+    .tick {
+      stroke: #b9b1a5;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .month {
+      fill: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .point {
+      fill: var(--accent);
+      stroke: #ffffff;
+      stroke-width: 4;
+    }
+
+    .point.average {
+      fill: var(--accent-2);
+    }
+
+    .vector {
+      stroke: var(--accent-2);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 7 7;
+    }
+
+    .name-label {
+      fill: var(--text);
+      font-size: 13px;
+      font-weight: 750;
+      paint-order: stroke;
+      stroke: #fffdf8;
+      stroke-width: 4;
+      stroke-linejoin: round;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .swatch {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .swatch.average {
+      background: var(--accent-2);
+    }
+
+    .empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 26%;
+      color: var(--muted);
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.45;
+      pointer-events: none;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        width: 100%;
+        padding: 0;
+      }
+
+      .app {
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .controls {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .controls,
+      .view {
+        padding: 20px 16px;
+      }
+
+      .person {
+        grid-template-columns: 1fr 38px;
+      }
+
+      .person label:nth-child(2) {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+
+      .remove {
+        grid-column: 2;
+        grid-row: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="app" aria-label="Калькулятор среднего дня рождения">
+      <div class="controls">
+        <h1>Средний день рождения</h1>
+        <p class="lead">Введите имена и даты. Каждая дата превращается в точку на годовом круге, а итог считается по сумме векторов.</p>
+
+        <div class="people" id="people"></div>
+        <button class="add" type="button" id="addPerson">Добавить человека</button>
+
+        <div class="result" aria-live="polite">
+          <div class="result-label">Результат</div>
+          <div class="result-date" id="resultDate">Введите даты</div>
+          <div class="result-note" id="resultNote">Для расчета нужна хотя бы одна корректная дата рождения.</div>
+        </div>
+      </div>
+
+      <div class="view">
+        <div class="chart-wrap">
+          <svg id="chart" viewBox="0 0 640 640" role="img" aria-label="Годовой круг с днями рождения"></svg>
+          <div class="empty" id="emptyState">Точки появятся на круге после ввода дат.</div>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i class="swatch"></i>День рождения</span>
+          <span><i class="swatch average"></i>Средняя дата</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <template id="personTemplate">
+    <div class="person">
+      <label>
+        Имя
+        <input type="text" autocomplete="name" placeholder="Имя">
+      </label>
+      <label>
+        Дата
+        <input type="date">
+      </label>
+      <button class="remove" type="button" title="Удалить" aria-label="Удалить человека">×</button>
+    </div>
+  </template>
+
+  <script>
+    const peopleEl = document.querySelector("#people");
+    const addButton = document.querySelector("#addPerson");
+    const template = document.querySelector("#personTemplate");
+    const chart = document.querySelector("#chart");
+    const emptyState = document.querySelector("#emptyState");
+    const resultDate = document.querySelector("#resultDate");
+    const resultNote = document.querySelector("#resultNote");
+
+    const TAU = Math.PI * 2;
+    const CENTER = 320;
+    const RADIUS = 238;
+    const MONTHS = [
+      "января", "февраля", "марта", "апреля", "мая", "июня",
+      "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    ];
+    const MONTH_LABELS = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+
+    function isLeapYear(year) {
+      return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    }
+
+    function daysInYear(year) {
+      return isLeapYear(year) ? 366 : 365;
+    }
+
+    function parseDate(value) {
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+      if (!match) return null;
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      if (
+        date.getUTCFullYear() !== year ||
+        date.getUTCMonth() !== month - 1 ||
+        date.getUTCDate() !== day
+      ) {
+        return null;
+      }
+      return { year, month, day, date };
+    }
+
+    function dayOfYear(parsed) {
+      const start = Date.UTC(parsed.year, 0, 1);
+      const current = Date.UTC(parsed.year, parsed.month - 1, parsed.day);
+      return Math.floor((current - start) / 86400000) + 1;
+    }
+
+    function angleForDate(parsed) {
+      const day = dayOfYear(parsed);
+      return ((day - 0.5) / daysInYear(parsed.year)) * TAU;
+    }
+
+    function normalizeAngle(angle) {
+      return ((angle % TAU) + TAU) % TAU;
+    }
+
+    function circularDistance(a, b) {
+      const diff = Math.abs(normalizeAngle(a) - normalizeAngle(b));
+      return Math.min(diff, TAU - diff);
+    }
+
+    function pointOnCircle(angle, radius = RADIUS) {
+      return {
+        x: CENTER + Math.sin(angle) * radius,
+        y: CENTER - Math.cos(angle) * radius
+      };
+    }
+
+    function createSvgElement(tag, attrs = {}) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      return el;
+    }
+
+    function formatDate(parsed) {
+      return `${parsed.day} ${MONTHS[parsed.month - 1]}`;
+    }
+
+    function closestCalendarDate(angle) {
+      let best = null;
+      for (let year = 2000; year < 2400; year += 1) {
+        const total = daysInYear(year);
+        for (let day = 1; day <= total; day += 1) {
+          const date = new Date(Date.UTC(year, 0, day));
+          const parsed = {
+            year,
+            month: date.getUTCMonth() + 1,
+            day: date.getUTCDate()
+          };
+          const candidateAngle = angleForDate(parsed);
+          const distance = circularDistance(angle, candidateAngle);
+          if (!best || distance < best.distance) {
+            best = { ...parsed, distance };
+          }
+        }
+      }
+      return best;
+    }
+
+    function collectEntries() {
+      return [...peopleEl.querySelectorAll(".person")]
+        .map((row, index) => {
+          const nameInput = row.querySelector('input[type="text"]');
+          const dateInput = row.querySelector('input[type="date"]');
+          const parsed = parseDate(dateInput.value);
+          if (!parsed) return null;
+          return {
+            name: nameInput.value.trim() || `Человек ${index + 1}`,
+            parsed,
+            angle: angleForDate(parsed)
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function renderBase() {
+      chart.replaceChildren();
+      chart.appendChild(createSvgElement("circle", {
+        class: "ring",
+        cx: CENTER,
+        cy: CENTER,
+        r: RADIUS
+      }));
+
+      for (let month = 0; month < 12; month += 1) {
+        const parsed = { year: 2025, month: month + 1, day: 1 };
+        const angle = angleForDate(parsed);
+        const tickStart = pointOnCircle(angle, RADIUS - 8);
+        const tickEnd = pointOnCircle(angle, RADIUS + 10);
+        const labelPoint = pointOnCircle(angle, RADIUS + 34);
+
+        chart.appendChild(createSvgElement("line", {
+          class: "tick",
+          x1: tickStart.x.toFixed(2),
+          y1: tickStart.y.toFixed(2),
+          x2: tickEnd.x.toFixed(2),
+          y2: tickEnd.y.toFixed(2)
+        }));
+
+        const label = createSvgElement("text", {
+          class: "month",
+          x: labelPoint.x.toFixed(2),
+          y: labelPoint.y.toFixed(2)
+        });
+        label.textContent = MONTH_LABELS[month];
+        chart.appendChild(label);
+      }
+    }
+
+    function renderPoint(entry, className = "point") {
+      const point = pointOnCircle(entry.angle);
+      const labelPoint = pointOnCircle(entry.angle, RADIUS - 34);
+
+      chart.appendChild(createSvgElement("circle", {
+        class: className,
+        cx: point.x.toFixed(2),
+        cy: point.y.toFixed(2),
+        r: className.includes("average") ? 9 : 7
+      }));
+
+      const label = createSvgElement("text", {
+        class: "name-label",
+        x: labelPoint.x.toFixed(2),
+        y: labelPoint.y.toFixed(2)
+      });
+      label.textContent = entry.name;
+      chart.appendChild(label);
+    }
+
+    function update() {
+      const entries = collectEntries();
+      renderBase();
+      emptyState.hidden = entries.length > 0;
+
+      if (entries.length === 0) {
+        resultDate.textContent = "Введите даты";
+        resultNote.textContent = "Для расчета нужна хотя бы одна корректная дата рождения.";
+        return;
+      }
+
+      let x = 0;
+      let y = 0;
+      entries.forEach((entry) => {
+        x += Math.cos(entry.angle);
+        y += Math.sin(entry.angle);
+        renderPoint(entry);
+      });
+
+      const vectorLength = Math.hypot(x, y) / entries.length;
+      if (vectorLength < 0.000001) {
+        resultDate.textContent = "Дата не определена";
+        resultNote.textContent = "Точки равномерно компенсируют друг друга на круге.";
+        return;
+      }
+
+      const averageAngle = normalizeAngle(Math.atan2(y, x));
+      const averageDate = closestCalendarDate(averageAngle);
+      const averagePoint = pointOnCircle(averageAngle);
+
+      chart.appendChild(createSvgElement("line", {
+        class: "vector",
+        x1: CENTER,
+        y1: CENTER,
+        x2: averagePoint.x.toFixed(2),
+        y2: averagePoint.y.toFixed(2)
+      }));
+      renderPoint({ name: "Среднее", angle: averageAngle }, "point average");
+
+      resultDate.textContent = formatDate(averageDate);
+      resultNote.textContent = `Расчет по ${entries.length} ${plural(entries.length, "дате", "датам", "датам")}. Сила среднего вектора: ${Math.round(vectorLength * 100)}%.`;
+    }
+
+    function plural(number, one, few, many) {
+      const mod10 = number % 10;
+      const mod100 = number % 100;
+      if (mod10 === 1 && mod100 !== 11) return one;
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+      return many;
+    }
+
+    function addPerson(name = "", date = "") {
+      const node = template.content.firstElementChild.cloneNode(true);
+      const nameInput = node.querySelector('input[type="text"]');
+      const dateInput = node.querySelector('input[type="date"]');
+      const removeButton = node.querySelector(".remove");
+
+      nameInput.value = name;
+      dateInput.value = date;
+      nameInput.addEventListener("input", update);
+      dateInput.addEventListener("input", update);
+      removeButton.addEventListener("click", () => {
+        node.remove();
+        if (peopleEl.children.length === 0) addPerson();
+        update();
+      });
+
+      peopleEl.appendChild(node);
+      update();
+      return node;
+    }
+
+    addButton.addEventListener("click", () => {
+      const row = addPerson();
+      row.querySelector('input[type="text"]').focus();
+    });
+
+    addPerson();
+    addPerson();
+    addPerson();
+  </script>
+</body>
+</html>
